@@ -2,8 +2,6 @@
 
 ## 5.2.1 (Next)
 
-* Your contribution here.
-
 ## 5.2.0 (2016/01/03)
 
 * [204](https://github.com/digitalplaywright/mongoid-slug/pull/204): The text portion of the slug is now truncated at `Mongoid::Slug::MONGO_INDEX_KEY_LIMIT_BYTES - 32` bytes by default and can be set via `max_length` - [@dblock](https://github.com/dblock).
