@@ -24,6 +24,13 @@ module Mongoid
       # alias_attribute :slugs, :_slugs
     end
 
+    class << self
+      attr_accessor :slug
+      def config(&block)
+        instance_eval(&block)
+      end
+    end
+
     module ClassMethods
       # @overload slug(*fields)
       #   Sets one ore more fields as source of slug.
@@ -73,12 +80,7 @@ module Mongoid
           index(*Mongoid::Slug::Index.build_index(slug_scope_key, by_model_type))
         end
 
-        #-- Why is it necessary to customize the slug builder?
-        default_url_builder = lambda do |cur_object|
-          cur_object.slug_builder.to_url
-        end
-
-        self.url_builder = block_given? ? block : default_url_builder
+        self.url_builder = block_given? ? block : default_slug_builder
 
         #-- always create slug on create
         #-- do not create new slug on update if the slug is permanent
@@ -99,6 +101,17 @@ module Mongoid
           set_callback :restore, :before, :set_slug!
           set_callback :save,    :before, :reset_slug!, if: :paranoid_deleted?
           set_callback :save,    :after,  :clear_slug!, if: :paranoid_deleted?
+        end
+      end
+
+      def default_slug_builder
+        if Mongoid::Slug.slug
+          Mongoid::Slug.slug
+        else
+          #-- Why is it necessary to customize the slug builder?
+          lambda do |cur_object|
+            cur_object.slug_builder.to_url
+          end
         end
       end
 

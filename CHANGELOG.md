@@ -1,8 +1,8 @@
 # CHANGELOG
 
-## Next
+## 5.2.0
 
-* Your contribution here.
+* [#166](https://github.com/digitalplaywright/mongoid-slug/issues/166): Feature to configure slug builder globally
 
 ## 5.1.0
 

@@ -471,6 +471,47 @@ module Mongoid
       end
     end
 
+    context 'when block is configured globally' do
+      before do
+        Mongoid::Slug.config do |c|
+          c.slug = proc{|cur_obj|
+            slug = cur_obj.slug_builder
+            (slug[0] + '-' + slug).to_url
+          }
+        end
+      end
+
+      it 'generates a slug' do
+        expect(Mongoid::Slug.slug).to be_present
+        class Person
+          include Mongoid::Document
+          include Mongoid::Slug
+
+          field :name
+          slug :name
+        end
+
+        person = Person.create(name: 'John')
+        expect(person.to_param).to eql 'j-john'
+      end
+
+      it 'should prefer block given to #slug ' do
+        expect(Mongoid::Slug.slug).to be_present
+        class Person
+          include Mongoid::Document
+          include Mongoid::Slug
+
+          field :name
+          slug :name do |cur_object|
+            cur_object.slug_builder.to_url
+          end
+        end
+
+        person = Person.create(name: 'John')
+        expect(person.to_param).to eql 'john'
+      end
+    end
+
     context 'when slugged field contains non-ASCII characters' do
       it 'slugs Cyrillic characters' do
         book.title = 'Капитал'
